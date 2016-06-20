@@ -12,6 +12,6 @@ main = do
     True  -> putStrLn $ "no url supplied!"
     False ->
       do 
-        rdrs <- traceRedirects' (args!!0) True
+        rdrs <- traceRedirectsTLD (args!!0) True
         putStrLn $ "Redirects:"
         mapM_ (\x -> putStrLn $ "- " ++ x) rdrs
