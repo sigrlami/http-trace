@@ -2,7 +2,7 @@
 
 module Http.Trace
        ( traceRedirects
-       , traceRedirects'  
+       , traceRedirectsTLD  
        , isReachable
        ) where
 
@@ -24,14 +24,19 @@ import           Safe
 fullUrlRegex :: Regex
 fullUrlRegex = [re|(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?|]
 
+-- | Regex for getting top-level web link from text
+-- 
 shortUrlRegex :: Regex
 shortUrlRegex = [re|(http|https)?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}|]
 
 userAgent = ""
 
 -- | Function to get all redirects for
---   provided url
-traceRedirects :: String -> IO [String]
+--   provided url in form of full link
+--   Search throught LOCATION meta, head
+--   and body tags
+traceRedirects :: String      -- ^ Starting url
+               -> IO [String] -- ^ List of available redirects
 traceRedirects start =
   traceAux start
      where
@@ -59,10 +64,13 @@ traceRedirects start =
                        Nothing    -> return $ ""
                        Just link  -> return $ fst link
 
--- | Version that returns top-level domain names
---   without full url path                     
-traceRedirects' :: String -> Bool -> IO [String]
-traceRedirects' start compress = do
+-- | Alternative to `traceRedrects` that returns top-level domain names
+--   without full url path. With compress functionality can show only
+--   distinct domains without repetition.                       
+traceRedirectsTLD :: String       -- ^ Starting url
+                  -> Bool         -- ^ Flag to remove duplicate domains
+                  -> IO [String]  -- ^ List of available redirects
+traceRedirectsTLD start compress = do
   rdrs <- traceRedirects start
   let rdrs' = map (\x -> fst $ head $ scan shortUrlRegex x) rdrs
   -- TODO: 1. apply shortUrlRegex
@@ -74,9 +82,11 @@ traceRedirects' start compress = do
 
 -- traceRedirectsWithType -- usually click/jump/track/badlink
 
--- | Check if we redirects paths lead to destination url
+-- | Checks if we redirects paths lead to destination url
 --                        
-isReachable :: String -> String -> IO Bool
+isReachable :: String  -- ^ Statring url
+            -> String  -- ^ Destination url
+            -> IO Bool -- ^ Flag whether url reached
 isReachable start dest =
   do
     redirects <- traceRedirects start
@@ -84,7 +94,8 @@ isReachable start dest =
       True  -> return $ False
       False -> return $ last redirects == dest
 
-
+--------------------------------------------------------------------------------
+      
 removeDuplicates :: Eq a => [a] -> [a]
 removeDuplicates = rdHelper []
     where rdHelper seen [] = seen
