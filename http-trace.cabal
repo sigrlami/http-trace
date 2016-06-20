@@ -1,5 +1,5 @@
 name:                http-trace
-version:             0.1.1.0
+version:             0.1.1.1
 synopsis:            Tracking http redirects 
 description:         Tracking http redirects for supplied url
 homepage:            https://github.com/sigrlami/http-trace#readme
