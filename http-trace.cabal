@@ -1,7 +1,7 @@
 name:                http-trace
-version:             0.1.0.0
+version:             0.1.1.0
 synopsis:            Tracking http redirects 
-description:         Please see README.md
+description:         Tracking http redirects for supplied url
 homepage:            https://github.com/sigrlami/http-trace#readme
 license:             MIT
 license-file:        LICENSE
@@ -12,16 +12,15 @@ category:            Web
 build-type:          Simple
 cabal-version:       >=1.10
 
-
 library
   hs-source-dirs:      src
   exposed-modules:     Http.Trace
   build-depends:       base >= 4.7 && < 5
-               ,       curl
-               ,       pcre-heavy
-               ,       template-haskell
-               ,       text
-               ,       safe
+               ,       curl >= 1.3.8
+               ,       pcre-heavy >= 1.0.0.0
+               ,       template-haskell 
+               ,       text 
+               ,       safe >= 0.3.9
                ,       transformers
                ,       MissingH
   default-language:    Haskell2010
@@ -29,11 +28,10 @@ library
 executable http-trace
   hs-source-dirs:      app
   main-is:             Main.hs
-  ghc-options:         -O1 -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
   build-depends:       base >= 4.7 && < 5
                ,       http-trace
-               ,       ascii-progress
 
   default-extensions:  OverloadedStrings
                     ,  TemplateHaskell
